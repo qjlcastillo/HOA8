@@ -1,0 +1,16 @@
+---
+- name: Install Nagios on Ubuntu and CentOS
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Include Nagios installation for Ubuntu
+      include_role:
+        name: nagios4_Ubuntu
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Include Nagios installation for CentOS
+      include_role:
+        name: nagios_CentOS
+      when: ansible_distribution == 'CentOS'

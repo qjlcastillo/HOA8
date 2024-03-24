@@ -1,0 +1,94 @@
+---
+- name: Installing Nagios4 Dependencies and Libraries
+  dnf:
+    name:
+      - autoconf
+      - gcc
+      - glibc
+      - make
+      - wget
+      - unzip
+      - httpd
+      - php
+      - gd-devel
+      - openssl
+      - openssl-devel
+      - autoconf
+      - gcc
+      - glibc
+      - libmcrypt-devel
+      - make
+      - openssl-devel
+      - wget
+      - bc
+      - gawk
+      - redhat-lsb-core
+      - net-snmp
+      - net-snmp-utils
+      - gettext
+      - python3-pip
+    state: latest
+
+- name: Install passlib Python Package
+  dnf:
+    name: python-passlib
+    state: present
+
+- name: Install passlib Python Package
+  dnf:
+    name: python2-passlib
+    state: present
+
+- name: Creating a directory for the downloaded files
+  file:
+    path: ~/nagios
+    state: directory
+
+- name: Downloading and Extracting Nagios from Github
+  unarchive:
+    src: https://github.com/NagiosEnterprises/nagioscore/archive/nagios-4.4.6.tar.gz
+    dest: ~/nagios
+    remote_src: yes
+    mode: 0777
+
+- name: Adding Users and Groups, Compiling, and Installing in Nagios from Github
+  shell:
+    cd ~/nagios/nagioscore-**
+    ./configure
+    make all
+    make install-groups-users
+    usermod -a -G nagios apache
+    make install
+    make install-daemoninit
+    make install-commandmode
+    make install-config
+    make install-webconf
+
+- name: Downloading and Extracting Nagios plugins from Github
+  unarchive:
+    src: https://github.com/nagios-plugins/nagios-plugins/archive/release-2.3.3.tar.gz
+    dest: ~/nagios
+    remote_src: yes
+    mode: 0777
+    owner: root
+    group: root
+
+- name: Compiling and Installing Nagios plugins
+  shell:
+    cd ~/nagios/nagios-plugins*
+    ./tools/setup
+    ./configure
+    make
+    make install
+
+- name: Confirmation of Nagios is enabled
+  service:
+    name: nagios
+    state: restarted
+    enabled: true
+
+- name: Confirmation of httpd is enabled
+  service:
+    name: httpd
+    state: restarted
+    enabled: true

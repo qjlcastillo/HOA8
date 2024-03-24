@@ -1,0 +1,34 @@
+---
+
+- name: install Nagios packages (Ubuntu)
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - nagios3
+    - nagios-plugins
+  when: "ansible_os_family == 'Debian'"
+
+- name: Start and enable Nagios Service (Ubuntu)
+  service:
+    name: nagios3
+    state: started
+    enabled: yes
+  when: "ansible_os_family == 'Debian'"
+
+- name: install Nagios packages (CentOS)
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - nagios
+    - nagios-plugins-all
+  when: "ansible_os_family == 'RedHat'"
+
+- name: Start and enable the Nagios service (CentOS)
+  service:
+    name: nagios
+    state: started
+    enabled: yes
+  when: "ansible_os_family == 'RedHat'"
+
